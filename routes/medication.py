@@ -17,3 +17,18 @@ def medication_days_left():
 
     result = MedicationService.calculate_days_left(medications)
     return jsonify(result)
+
+@bp.route('/required-doses', methods=['POST'])
+def medication_required_doses():
+    """
+    Endpoint pour calculer le nombre de doses nécessaires pour une durée donnée.
+    """
+    data = request.get_json()
+    medications = data.get('medications', [])
+    days = data.get('days', 0)
+
+    if not medications or days <= 0:
+        return jsonify({"error": "Les champs 'medications' et 'days' sont obligatoires et doivent être valides."}), 400
+
+    result = MedicationService.calculate_required_doses(medications, days)
+    return jsonify(result)

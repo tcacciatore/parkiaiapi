@@ -30,3 +30,30 @@ class MedicationService:
             })
 
         return {"alerts": alerts}
+
+    @staticmethod
+    def calculate_required_doses(medications, days):
+        """
+        Calcule le nombre de doses nécessaires pour chaque médicament en fonction d'une durée donnée.
+        """
+        required_doses = []
+
+        for medication in medications:
+            name = medication.get('name')
+            dose_per_day = medication.get('dose_per_day', 0)
+
+            if not name or dose_per_day <= 0:
+                required_doses.append({
+                    "medication": name or "Inconnu",
+                    "message": "Données invalides pour ce médicament."
+                })
+                continue
+
+            # Calculer le nombre de doses nécessaires
+            total_doses = dose_per_day * days
+            required_doses.append({
+                "medication": name,
+                "required_doses": total_doses
+            })
+
+        return {"required_doses": required_doses, "duration": days}
