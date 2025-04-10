@@ -8,6 +8,10 @@ def create_app():
     app.register_blueprint(dishes.bp)
     app.register_blueprint(medication.bp)
     
+    @app.route("/")
+    def hello():
+        return "API Parkinson bien déployée !"
+    
     return app
 
 if __name__ == "__main__":
