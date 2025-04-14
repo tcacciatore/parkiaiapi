@@ -1,5 +1,5 @@
 from flask import Flask
-from routes import dishes, medication, exercises, songs, graphe_states, metrics
+from routes import dishes, medication, exercises, songs, metrics
 
 def create_app():
     app = Flask(__name__)
@@ -9,7 +9,6 @@ def create_app():
     app.register_blueprint(medication.bp)
     app.register_blueprint(exercises.bp)
     app.register_blueprint(songs.bp)
-    app.register_blueprint(graphe_states.bp)
     app.register_blueprint(metrics.bp)
 
 
