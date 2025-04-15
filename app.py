@@ -6,7 +6,6 @@ def create_app():
 
     # Enregistrement des blueprints
     app.register_blueprint(dishes.bp)
-    app.register_blueprint(medication.bp)
     app.register_blueprint(exercises.bp)
     app.register_blueprint(songs.bp)
     app.register_blueprint(metrics.bp)
