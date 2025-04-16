@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from services.dishes_services import get_all_dishes, get_dish_by_id, get_recommended_dishes, recommend_better_dish
+from services.dishes_services import get_all_diet_types, get_all_dish_types, get_all_dishes, get_all_preparation_methods, get_dish_by_id, get_recommended_dishes, recommend_better_dish
 
 bp = Blueprint('dishes', __name__, url_prefix='/dishes')
 
@@ -37,3 +37,30 @@ def recommend_better_dish_route(dish_id):
     if not recommended_dishes:
         return jsonify({"error": "Aucune recommandation trouvée"}), 404
     return jsonify([dish.to_dict() for dish in recommended_dishes])
+
+
+@bp.route('/preparation_methods', methods=['GET'])
+def get_preparation_methods():
+    """
+    Endpoint pour récupérer toutes les méthodes de préparation.
+    """
+    preparation_methods = get_all_preparation_methods()
+    return jsonify(preparation_methods)
+
+
+@bp.route('/diet_types', methods=['GET'])
+def get_diet_types():
+    """
+    Endpoint pour récupérer tous les types de régimes.
+    """
+    diet_types = get_all_diet_types()
+    return jsonify(diet_types)
+
+
+@bp.route('/dish_types', methods=['GET'])
+def get_dish_types():
+    """
+    Endpoint pour récupérer tous les types de plats.
+    """
+    dish_types = get_all_dish_types()
+    return jsonify(dish_types)

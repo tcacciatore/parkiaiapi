@@ -151,11 +151,7 @@ def get_recommended_dishes(filters=None, days=7):
 
 def recommend_better_dish(current_dish_id):
     """
-    Recommande jusqu'à 3 plats avec le même preparation_method et dish_type,
-    mais avec un meilleur score. Les résultats sont sélectionnés aléatoirement.
-    Respecte les restrictions de diet_type.
-    :param current_dish_id: ID du plat actuel.
-    :return: Une liste d'objets Dish ou une liste vide si aucune recommandation n'est trouvée.
+    Recommande plusieurs plats avec un meilleur score.
     """
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -175,34 +171,24 @@ def recommend_better_dish(current_dish_id):
 
     preparation_method, dish_type, current_score, current_diet_type = current_dish
 
-    # Construire la condition pour exclure certains diet_type
-    diet_exclusion = ""
-    params = [preparation_method, dish_type, current_score]
-
-    if current_diet_type == "vegan":
-        diet_exclusion = "AND diet_type NOT IN ('omnivore', 'vegetarian')"
-    elif current_diet_type == "vegetarian":
-        diet_exclusion = "AND diet_type NOT IN ('omnivore')"
-
-    # Rechercher plusieurs plats avec un meilleur score
-    query = f"""
+    # Construire la requête pour trouver des plats avec un meilleur score
+    query = """
         SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level,
                preparation_method, dish_type, diet_type, created_at
         FROM dishes
-        WHERE preparation_method = %s
-          AND dish_type = %s
+        WHERE dish_type = %s
           AND score < %s
-          {diet_exclusion}
         ORDER BY score ASC
+        LIMIT 3
     """
-    cursor.execute(query, params)
+    cursor.execute(query, (dish_type, current_score))
     better_dishes = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
     # Convertir les résultats en objets Dish
-    dishes = [
+    return [
         Dish(
             id=row[0],
             name=row[1],
@@ -219,6 +205,50 @@ def recommend_better_dish(current_dish_id):
         for row in better_dishes
     ]
 
-    # Mélanger les résultats et limiter à 3 plats
-    random.shuffle(dishes)
-    return dishes[:3]
+def get_all_preparation_methods():
+    """
+    Récupère toutes les méthodes de préparation uniques.
+    :return: Liste des méthodes de préparation.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT DISTINCT preparation_method FROM dishes")
+    preparation_methods = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    conn.close()
+
+    return preparation_methods
+
+def get_all_diet_types():
+    """
+    Récupère tous les types de régimes uniques.
+    :return: Liste des types de régimes.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT DISTINCT diet_type FROM dishes")
+    diet_types = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    conn.close()
+
+    return diet_types
+
+def get_all_dish_types():
+    """
+    Récupère tous les types de plats uniques.
+    :return: Liste des types de plats.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT DISTINCT dish_type FROM dishes")
+    dish_types = [row[0] for row in cursor.fetchall()]
+
+    cursor.close()
+    conn.close()
+
+    return dish_types
