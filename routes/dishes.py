@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from services.dishes_services import get_all_dishes, get_dish_by_id, get_recommended_dishes
+from services.dishes_services import get_all_dishes, get_dish_by_id, get_recommended_dishes, recommend_better_dish
 
 bp = Blueprint('dishes', __name__, url_prefix='/dishes')
 
@@ -7,7 +7,7 @@ bp = Blueprint('dishes', __name__, url_prefix='/dishes')
 def list_dishes():
     filters = request.args.to_dict()
     dishes = get_all_dishes(filters)
-    return jsonify(dishes)
+    return jsonify([dish.to_dict() for dish in dishes])
 
 @bp.route('/<int:dish_id>', methods=['GET'])
 def get_dish(dish_id):
@@ -27,3 +27,13 @@ def recommend_dishes():
     limit = min(limit, 7)  # Imposer une limite maximale de 7 jours
     recommendations = get_recommended_dishes(filters, limit)
     return jsonify(recommendations)
+
+@bp.route('/<int:dish_id>/recommendation', methods=['GET'])
+def recommend_better_dish_route(dish_id):
+    """
+    Endpoint pour recommander plusieurs plats avec un meilleur score.
+    """
+    recommended_dishes = recommend_better_dish(dish_id)
+    if not recommended_dishes:
+        return jsonify({"error": "Aucune recommandation trouvée"}), 404
+    return jsonify([dish.to_dict() for dish in recommended_dishes])
