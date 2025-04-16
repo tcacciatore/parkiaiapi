@@ -42,7 +42,126 @@ Parkiai API est une application qui fournit des services pour analyser et recomm
 
 ---
 
-### 2. Calcul des métriques
+### 2. Récupération des filtres
+#### a. Récupérer toutes les méthodes de préparation, types de régimes et types de plats
+- **Endpoint** : `/dishes/filters`
+- **Description** : Récupère toutes les méthodes de préparation, types de régimes et types de plats disponibles.
+- **Exemple de réponse** :
+  ```json
+  {
+      "preparation_methods": ["baked", "boiled", "grilled", "raw"],
+      "diet_types": ["omnivore", "vegetarian", "vegan"],
+      "dish_types": ["starter", "main dish", "dessert"]
+  }
+  ```
+
+#### b. Récupérer toutes les méthodes de préparation
+- **Endpoint** : `/dishes/preparation_methods`
+- **Description** : Récupère toutes les méthodes de préparation uniques.
+- **Exemple de réponse** :
+  ```json
+  ["baked", "boiled", "grilled", "raw"]
+  ```
+
+#### c. Récupérer tous les types de régimes
+- **Endpoint** : `/dishes/diet_types`
+- **Description** : Récupère tous les types de régimes uniques.
+- **Exemple de réponse** :
+  ```json
+  ["omnivore", "vegetarian", "vegan"]
+  ```
+
+#### d. Récupérer tous les types de plats
+- **Endpoint** : `/dishes/dish_types`
+- **Description** : Récupère tous les types de plats uniques.
+- **Exemple de réponse** :
+  ```json
+  ["starter", "main dish", "dessert"]
+  ```
+
+---
+
+### 3. Recommandation de plats similaires
+- **Endpoint** : `/dishes/<int:dish_id>/recommendation`
+- **Description** : Recommande jusqu'à 3 plats similaires avec un meilleur score, en respectant les critères de `preparation_method`, `dish_type`, et `diet_type`.
+- **Paramètres** :
+  - `dish_id` (int) : ID du plat pour lequel générer des recommandations.
+- **Exemple de réponse** :
+  ```json
+  [
+      {
+          "id": 342,
+          "name": "Verrine de fruits frais",
+          "score": "A",
+          "fat_level": "low",
+          "fiber_level": "high",
+          "protein_level": "low",
+          "sodium_level": "low",
+          "preparation_method": "raw",
+          "dish_type": "dessert",
+          "diet_type": "vegan",
+          "created_at": "2025-04-16T12:00:00"
+      },
+      {
+          "id": 345,
+          "name": "Muffin aux myrtilles",
+          "score": "B",
+          "fat_level": "high",
+          "fiber_level": "low",
+          "protein_level": "medium",
+          "sodium_level": "low",
+          "preparation_method": "baked",
+          "dish_type": "dessert",
+          "diet_type": "vegetarian",
+          "created_at": "2025-04-16T12:00:00"
+      }
+  ]
+  ```
+
+---
+
+### 4. Récupération de tous les plats
+- **Endpoint** : `/dishes`
+- **Description** : Récupère tous les plats disponibles dans la base de données, avec des options de filtrage.
+- **Paramètres** :
+  - `score` (str) : Filtrer par score (par exemple, `A`, `B`, `C`, etc.).
+  - `dish_type` (str) : Filtrer par type de plat (par exemple, `starter`, `main dish`, `dessert`).
+  - `diet_type` (str) : Filtrer par type de régime (par exemple, `omnivore`, `vegetarian`, `vegan`).
+- **Exemple de réponse** :
+  ```json
+  [
+      {
+          "id": 1,
+          "name": "Salade César",
+          "score": "A",
+          "fat_level": "low",
+          "fiber_level": "medium",
+          "protein_level": "high",
+          "sodium_level": "medium",
+          "preparation_method": "raw",
+          "dish_type": "starter",
+          "diet_type": "omnivore",
+          "created_at": "2025-04-16T12:00:00"
+      },
+      {
+          "id": 2,
+          "name": "Saumon grillé",
+          "score": "A",
+          "fat_level": "medium",
+          "fiber_level": "low",
+          "protein_level": "high",
+          "sodium_level": "medium",
+          "preparation_method": "grilled",
+          "dish_type": "main dish",
+          "diet_type": "omnivore",
+          "created_at": "2025-04-16T12:00:00"
+      }
+  ]
+  ```
+
+---
+
+### 5. Calcul des métriques
 - **Méthode** : `compute_metrics`
 - **Description** : Calcule des métriques basées sur des données temporelles et des états.
 - **Entrée** :
