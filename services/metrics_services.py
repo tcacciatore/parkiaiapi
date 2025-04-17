@@ -27,6 +27,57 @@ class MetricsService:
         return durations
 
     @staticmethod
+    def calculate_duree_journee(reveil_time, coucher_time):
+        """
+        Calcule la durée de la journée en secondes.
+        """
+        return int((coucher_time - reveil_time).total_seconds())
+
+    @staticmethod
+    def calculate_temps_deblocage(etats, reveil_time):
+        """
+        Calcule le temps de déblocage (temps avant le premier état actif après le réveil).
+        """
+        for ts, state in etats:
+            if ts >= reveil_time and state == 1:
+                return int((ts - reveil_time).total_seconds())
+        return None  # Aucun état actif trouvé
+
+    @staticmethod
+    def calculate_fluctuations(etats):
+        """
+        Calcule le nombre de fluctuations (transitions de 1 à 0).
+        """
+        return MetricsService.count_fluctuations(etats)
+
+    @staticmethod
+    def calculate_durations_by_state(etats):
+        """
+        Calcule les durées cumulées pour chaque état (0, 1, 2) en secondes.
+        """
+        durations = MetricsService.duration_by_state(etats)
+        return {state: int(duration.total_seconds()) for state, duration in durations.items()}
+
+    @staticmethod
+    def calculate_moyenne_duree_on(etats):
+        """
+        Calcule la durée moyenne des périodes ON (état = 1).
+        """
+        on_durations = [
+            int((etats[i+1][0] - etats[i][0]).total_seconds())
+            for i in range(0, len(etats) - 1)
+            if etats[i][1] == 1
+        ]
+        return int(sum(on_durations) / len(on_durations)) if on_durations else 0
+
+    @staticmethod
+    def calculate_temps_actif(reveil_time, coucher_time):
+        """
+        Calcule le temps actif entre le réveil et le coucher en secondes.
+        """
+        return int((coucher_time - reveil_time).total_seconds())
+
+    @staticmethod
     def compute_metrics(data):
         # Configurer les logs
         logging.basicConfig(level=logging.DEBUG)
@@ -52,65 +103,39 @@ class MetricsService:
             logger.error(f"Erreur lors du calcul des heures de réveil et de coucher : {e}")
             raise
 
-        # Étape 3 : Temps de déblocage
+        # Calcul des métriques
         try:
-            deblocage = None
-            for ts, state in etats:
-                if ts >= reveil_time and state == 1:
-                    deblocage = int((ts - reveil_time).total_seconds())
-                    break
-            logger.debug(f"Temps de déblocage (en secondes) : {deblocage}")
-        except Exception as e:
-            logger.error(f"Erreur lors du calcul du temps de déblocage : {e}")
-            raise
+            duree_journee = MetricsService.calculate_duree_journee(reveil_time, coucher_time)
+            logger.debug(f"Durée de la journée (en secondes) : {duree_journee}")
 
-        # Étape 4 : Fluctuations
-        try:
-            fluctuations = MetricsService.count_fluctuations(etats)
+            temps_deblocage = MetricsService.calculate_temps_deblocage(etats, reveil_time)
+            logger.debug(f"Temps de déblocage (en secondes) : {temps_deblocage}")
+
+            fluctuations = MetricsService.calculate_fluctuations(etats)
             logger.debug(f"Nombre de fluctuations : {fluctuations}")
-        except Exception as e:
-            logger.error(f"Erreur lors du calcul des fluctuations : {e}")
-            raise
 
-        # Étape 5 : Durées cumulées par état
-        try:
-            durations = MetricsService.duration_by_state(etats)
-            durations_in_seconds = {state: int(duration.total_seconds()) for state, duration in durations.items()}
+            durations_in_seconds = MetricsService.calculate_durations_by_state(etats)
             logger.debug(f"Durées par état (en secondes) : {durations_in_seconds}")
-        except Exception as e:
-            logger.error(f"Erreur lors du calcul des durées par état : {e}")
-            raise
 
-        # Étape 6 : Durée moyenne ON
-        try:
-            on_durations = [
-                int((etats[i+1][0] - etats[i][0]).total_seconds())
-                for i in range(0, len(etats) - 1)
-                if etats[i][1] == 1
-            ]
-            moyenne_on = int(sum(on_durations) / len(on_durations)) if on_durations else 0
-            logger.debug(f"Durée moyenne ON (en secondes) : {moyenne_on}")
-        except Exception as e:
-            logger.error(f"Erreur lors du calcul de la durée moyenne ON : {e}")
-            raise
+            moyenne_duree_on = MetricsService.calculate_moyenne_duree_on(etats)
+            logger.debug(f"Durée moyenne ON (en secondes) : {moyenne_duree_on}")
 
-        # Étape 7 : Temps actif
-        try:
-            temps_actif = int((coucher_time - reveil_time).total_seconds())
+            temps_actif = MetricsService.calculate_temps_actif(reveil_time, coucher_time)
             logger.debug(f"Temps actif (en secondes) : {temps_actif}")
         except Exception as e:
-            logger.error(f"Erreur lors du calcul du temps actif : {e}")
+            logger.error(f"Erreur lors du calcul des métriques : {e}")
             raise
 
         # Résultat final
         result = {
-            "temps_deblocage": deblocage if deblocage is not None else "non atteint",
+            "temps_deblocage": temps_deblocage if temps_deblocage is not None else "non atteint",
             "fluctuations": fluctuations,
             "duree_on": durations_in_seconds[1],
             "duree_off": durations_in_seconds[0],
             "duree_surdose": durations_in_seconds[2],
-            "moyenne_duree_on": moyenne_on,
-            "temps_actif": temps_actif
+            "moyenne_duree_on": moyenne_duree_on,
+            "temps_actif": temps_actif,
+            "duree_journee": duree_journee
         }
         logger.debug(f"Résultat final : {result}")
 
