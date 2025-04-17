@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from models.dish import Dish
 import random
 
+# Définir les catégories globalement
+CATEGORIES = ["starter", "main dish", "dessert"]
+
 def get_all_dishes(filters):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -73,10 +76,10 @@ def get_dish_by_id(dish_id):
 def get_recommended_dishes(filters=None, days=7):
     """
     Génère des recommandations de plats pour un nombre donné de jours.
-    Chaque jour inclut une entrée, un plat principal et un dessert.
+    Chaque jour inclut une entrée (salad, starter ou soup), un plat principal (main dish) et un dessert.
     Aucun plat ne doit être recommandé deux fois.
     :param filters: Dictionnaire de filtres optionnels (score, etc.).
-    :param days: Nombre de jours pour lesquels générer des recommandations.
+    :param days: Nombre de jours pour lesquels générer des recommandations (maximum 7).
     :return: Liste de recommandations par jour.
     """
     # Connexion à la base de données via get_db_connection
@@ -86,23 +89,25 @@ def get_recommended_dishes(filters=None, days=7):
     # Initialiser les résultats
     recommendations = []
 
-    # Catégories à récupérer
-    categories = ["entrée", "plat", "dessert"]
-
     # Liste des plats déjà recommandés
     used_dish_ids = set()
 
-    for day in range(1, days + 1):
+    # Catégories pour les recommandations
+    ENTRY_CATEGORIES = ["salad", "starter", "soup"]
+    MAIN_DISH_CATEGORY = "main dish"
+    DESSERT_CATEGORY = "dessert"
+
+    for day in range(1, min(days, 7) + 1):  # Limiter à un maximum de 7 jours
         daily_recommendation = {"day": day}
 
-        for category in categories:
-            # Construire la requête SQL pour chaque catégorie
+        # Recommander une entrée (salad, starter ou soup)
+        for entry_category in ENTRY_CATEGORIES:
             query = f"""
-                SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, category, created_at
+                SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, dish_type, created_at
                 FROM dishes
-                WHERE category = %(category)s
+                WHERE dish_type = %(dish_type)s
             """
-            params = {"category": category}
+            params = {"dish_type": entry_category}
 
             # Appliquer les filtres si fournis
             if filters:
@@ -112,10 +117,10 @@ def get_recommended_dishes(filters=None, days=7):
                     conditions.append("score = ANY(%(scores)s)")
                     params['scores'] = scores
                 if 'fat_level' in filters:
-                    conditions.append("fat_level = %(fat_level)s)")
+                    conditions.append("fat_level = %(fat_level)s")
                     params['fat_level'] = filters['fat_level']
                 if 'fiber_level' in filters:
-                    conditions.append("fiber_level = %(fiber_level)s)")
+                    conditions.append("fiber_level = %(fiber_level)s")
                     params['fiber_level'] = filters['fiber_level']
 
                 if conditions:
@@ -133,12 +138,96 @@ def get_recommended_dishes(filters=None, days=7):
             cursor.execute(query, params)
             dish = cursor.fetchone()
 
-            # Ajouter le plat recommandé à la catégorie correspondante
             if dish:
-                daily_recommendation[category] = dish
+                daily_recommendation["entry"] = dish
                 used_dish_ids.add(dish['id'])  # Marquer le plat comme utilisé
-            else:
-                daily_recommendation[category] = None  # Aucun plat disponible pour cette catégorie
+                break  # Une seule entrée est nécessaire
+
+        # Recommander un plat principal (main dish)
+        query = f"""
+            SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, dish_type, created_at
+            FROM dishes
+            WHERE dish_type = %(dish_type)s
+        """
+        params = {"dish_type": MAIN_DISH_CATEGORY}
+
+        # Appliquer les filtres si fournis
+        if filters:
+            conditions = []
+            if 'score' in filters:
+                scores = filters['score'].split(',')
+                conditions.append("score = ANY(%(scores)s)")
+                params['scores'] = scores
+            if 'fat_level' in filters:
+                conditions.append("fat_level = %(fat_level)s")
+                params['fat_level'] = filters['fat_level']
+            if 'fiber_level' in filters:
+                conditions.append("fiber_level = %(fiber_level)s")
+                params['fiber_level'] = filters['fiber_level']
+
+            if conditions:
+                query += " AND " + " AND ".join(conditions)
+
+        # Exclure les plats déjà recommandés
+        if used_dish_ids:
+            query += " AND id NOT IN %(used_ids)s"
+            params['used_ids'] = tuple(used_dish_ids)
+
+        # Ajouter le tri et limiter à 1 résultat
+        query += " ORDER BY score ASC LIMIT 1"
+
+        # Exécuter la requête
+        cursor.execute(query, params)
+        dish = cursor.fetchone()
+
+        if dish:
+            daily_recommendation["main_dish"] = dish
+            used_dish_ids.add(dish['id'])  # Marquer le plat comme utilisé
+        else:
+            daily_recommendation["main_dish"] = None  # Aucun plat principal disponible
+
+        # Recommander un dessert
+        query = f"""
+            SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, dish_type, created_at
+            FROM dishes
+            WHERE dish_type = %(dish_type)s
+        """
+        params = {"dish_type": DESSERT_CATEGORY}
+
+        # Appliquer les filtres si fournis
+        if filters:
+            conditions = []
+            if 'score' in filters:
+                scores = filters['score'].split(',')
+                conditions.append("score = ANY(%(scores)s)")
+                params['scores'] = scores
+            if 'fat_level' in filters:
+                conditions.append("fat_level = %(fat_level)s")
+                params['fat_level'] = filters['fat_level']
+            if 'fiber_level' in filters:
+                conditions.append("fiber_level = %(fiber_level)s")
+                params['fiber_level'] = filters['fiber_level']
+
+            if conditions:
+                query += " AND " + " AND ".join(conditions)
+
+        # Exclure les plats déjà recommandés
+        if used_dish_ids:
+            query += " AND id NOT IN %(used_ids)s"
+            params['used_ids'] = tuple(used_dish_ids)
+
+        # Ajouter le tri et limiter à 1 résultat
+        query += " ORDER BY score ASC LIMIT 1"
+
+        # Exécuter la requête
+        cursor.execute(query, params)
+        dish = cursor.fetchone()
+
+        if dish:
+            daily_recommendation["dessert"] = dish
+            used_dish_ids.add(dish['id'])  # Marquer le plat comme utilisé
+        else:
+            daily_recommendation["dessert"] = None  # Aucun dessert disponible
 
         # Ajouter la recommandation quotidienne à la liste
         recommendations.append(daily_recommendation)
