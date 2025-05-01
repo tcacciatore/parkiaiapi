@@ -1,12 +1,32 @@
+DROP TABLE IF EXISTS dishes;
+CREATE TABLE dishes (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    fat_level TEXT,
+    fiber_level TEXT,
+    protein_level TEXT,
+    sodium_level TEXT,
+    score CHAR(1),
+    preparation_method TEXT,
+    dish_type TEXT,
+    diet_type TEXT,
+    antioxidant_level TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+BEGIN;
+
+
+
 -- Cleaned and corrected dishes
 
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (1, 'Riz cantonnais', 'low', 'low', 'low', 'low', 'C', 'boiled', 'main dish', 'vegan', 'low', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (2, 'Clafoutis aux cerises', 'low', 'low', 'low', 'low', 'C', 'fried', 'main dish', 'vegetarian', 'low', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (3, 'Bibimbap au bœuf', 'high', 'low', 'high', 'high', 'B', 'fried', 'main dish', 'omnivore', 'low', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (4, 'Patates douces au four', 'low', 'low', 'low', 'low', 'C', 'fried', 'main dish', 'vegan', 'low', NOW());
-INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (5, 'Houmous au poivron', 'medium', 'low', 'medium', 'B', 'stewed', 'vegan', 'medium', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (6, 'Chocolat chaud avec marshmallows', 'high', 'low', 'low', 'low', 'D', 'roasted', 'main dish', 'vegan', 'low', NOW());
+
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (7, 'Soupe au brocoli', 'low', 'low', 'low', 'low', 'S', 'raw', 'main dish', 'vegan', 'high', NOW());
+
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (8, 'Riz basmati aux épices', 'low', 'medium', 'low', 'medium', 'B', 'raw', 'main dish', 'vegan', 'medium', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (9, 'Couscous de légumes rôtis', 'low', 'low', 'low', 'low', 'C', 'boiled', 'main dish', 'vegan', 'low', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (10, 'Salade de tomates et avocat', 'low', 'high', 'medium', 'low', 'S', 'steamed', 'main dish', 'omnivore', 'low', NOW());
@@ -421,3 +441,5 @@ INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_leve
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (419, 'Moelleux Marron', 'medium', 'medium', 'medium', 'medium', 'C', 'baked', 'main dish', 'omnivore', 'medium', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (420, 'Cheesecake', 'medium', 'medium', 'medium', 'medium', 'C', 'baked', 'main dish', 'omnivore', 'medium', NOW());
 INSERT INTO dishes (id, name, fat_level, fiber_level, protein_level, sodium_level, score, preparation_method, dish_type, diet_type, antioxidant_level, created_at) VALUES (421, 'Tartelette Citron', 'medium', 'medium', 'medium', 'medium', 'C', 'baked', 'main dish', 'omnivore', 'medium', NOW());
+
+COMMIT;

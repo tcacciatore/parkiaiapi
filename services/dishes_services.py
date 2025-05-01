@@ -13,7 +13,7 @@ def get_all_dishes(filters):
     cursor = conn.cursor()
 
     query = """
-        SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, preparation_method, dish_type, diet_type, created_at
+        SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level, preparation_method, dish_type, diet_type,antioxidant_level, created_at
         FROM dishes
     """
     params = []
@@ -38,15 +38,16 @@ def get_all_dishes(filters):
         Dish(
             id=row[0],
             name=row[1],
-            score=row[2],
-            fat_level=row[3],
-            fiber_level=row[4],
-            protein_level=row[5],
-            sodium_level=row[6],
+            fat_level=row[2],
+            fiber_level=row[3],
+            protein_level=row[4],
+            sodium_level=row[5],
+            score=row[6],
             preparation_method=row[7],
             dish_type=row[8],
             diet_type=row[9],
-            created_at=row[10]
+            antioxidant_level=row[10],
+            created_at=row[11]
         )
         for row in rows
     ]
@@ -263,7 +264,7 @@ def recommend_better_dish(current_dish_id):
     # Construire la requête pour trouver des plats avec un meilleur score
     query = """
         SELECT id, name, score, fat_level, fiber_level, protein_level, sodium_level,
-               preparation_method, dish_type, diet_type, created_at
+               preparation_method, dish_type, diet_type, antioxidant_level, created_at
         FROM dishes
         WHERE dish_type = %s
           AND score < %s
@@ -276,20 +277,22 @@ def recommend_better_dish(current_dish_id):
     cursor.close()
     conn.close()
 
+
     # Convertir les résultats en objets Dish
     return [
         Dish(
             id=row[0],
             name=row[1],
-            score=row[2],
-            fat_level=row[3],
-            fiber_level=row[4],
-            protein_level=row[5],
-            sodium_level=row[6],
+            fat_level=row[2],
+            fiber_level=row[3],
+            protein_level=row[4],
+            sodium_level=row[5],
+            score=row[6],
             preparation_method=row[7],
             dish_type=row[8],
             diet_type=row[9],
-            created_at=row[10]
+            antioxidant_level=row[10],
+            created_at=row[11]
         )
         for row in better_dishes
     ]

@@ -1,10 +1,12 @@
 
+DROP TABLE IF EXISTS keywords;
 -- Création de la table keywords si besoin
-CREATE TABLE IF NOT EXISTS keywords (
+CREATE TABLE keywords (
     id SERIAL PRIMARY KEY,
     keyword TEXT NOT NULL,
     emoji TEXT NOT NULL
 );
+BEGIN;
 
 -- Insertion enrichie de mots-clés
 INSERT INTO keywords (keyword, emoji) VALUES
@@ -353,3 +355,6 @@ INSERT INTO keywords (keyword, emoji) VALUES ('champagne', '🥂');
 INSERT INTO keywords (keyword, emoji) VALUES ('cocktail', '🍸');
 INSERT INTO keywords (keyword, emoji) VALUES ('cocktail rhum', '🍹');
 INSERT INTO keywords (keyword, emoji) VALUES ('bouteille champagne', '🍾');
+
+
+COMMIT;
