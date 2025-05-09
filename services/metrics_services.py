@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 import logging
 
+from parkiaiapi.models.state import State
+
 class MetricsService:
 
     @staticmethod
@@ -10,12 +12,32 @@ class MetricsService:
         :param etats: Liste de dictionnaires contenant 'date' et 'etat'.
         :return: Liste de tuples (datetime, etat).
         """
-        parsed = [(datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S"), item['etat']) for item in etats]
+        parsed = []
+
+        if not isinstance(etats, list):
+            raise ValueError("states input are missing")
+        
+        for i in range(len(etats)):
+            if i < len(etats) - 1:
+                if 'etat' not in etats[i] and 'etat' not in etats[i+1]:
+                    raise ValueError("etat is missing")
+                
+                startDt = datetime.fromtimestamp(int(etats[i]["date"]))
+                endDt = datetime.fromtimestamp(int(etats[i+1]["date"]))
+                parsed.append(State(startDt, endDt, etats[i]['etat']))
+
         return parsed
 
     @staticmethod
     def count_fluctuations(etats):
-        return sum(1 for i in range(1, len(etats)) if etats[i-1][1] == 1 and etats[i][1] == 0)
+        count = 0
+        for prev, curr in zip(etats, etats[1:]):
+            if prev[1] in {0, 1, 2} and curr[1] in {0, 1, 2}:
+                if prev[1] != curr[1]:
+                    count += 1
+        return count
+
+
 
     @staticmethod
     def duration_by_state(etats):
@@ -68,7 +90,7 @@ class MetricsService:
             for i in range(0, len(etats) - 1)
             if etats[i][1] == 1
         ]
-        return int(sum(on_durations) / len(on_durations)) if on_durations else 0
+        return int(sum(on_durations) / (len(on_durations)/2)) if on_durations else 0
 
     @staticmethod
     def calculate_temps_actif(reveil_time, coucher_time):
