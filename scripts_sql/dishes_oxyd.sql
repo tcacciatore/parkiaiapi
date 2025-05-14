@@ -15,7 +15,7 @@ CREATE TABLE dishes (
 );
 BEGIN;
 
-
+-- How to run : psql -d parking -f dishes_oxyd.sql
 
 -- Cleaned and corrected dishes
 

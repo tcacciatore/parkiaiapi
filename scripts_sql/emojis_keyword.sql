@@ -212,6 +212,8 @@ INSERT INTO keywords (keyword, emoji) VALUES ('oignon', '🧅');
 INSERT INTO keywords (keyword, emoji) VALUES ('échalote', '🧅');
 INSERT INTO keywords (keyword, emoji) VALUES ('aubergine', '🍆');
 INSERT INTO keywords (keyword, emoji) VALUES ('tomate', '🍅');
+INSERT INTO keywords (keyword, emoji) VALUES ('tomates', '🍅');
+
 INSERT INTO keywords (keyword, emoji) VALUES ('tomates cerises', '🍅');
 INSERT INTO keywords (keyword, emoji) VALUES ('pomme de terre', '🥔');
 INSERT INTO keywords (keyword, emoji) VALUES ('patate', '🥔');

@@ -23,18 +23,23 @@ def get_emoji_sequence(dish_name):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Préparation du nom du plat
     words = re.findall(r'\w+', dish_name.lower())
 
-    emoji_sequence = []
+    emojis = []
+    seen = set()  # pour éviter les doublons
 
     for word in words:
         cursor.execute("SELECT emoji FROM keywords WHERE keyword = %s", (word,))
         result = cursor.fetchone()
         if result:
-            emoji_sequence.append(result[0])
+            emoji = result[0]
+            if emoji not in seen:
+                emojis.append(emoji)
+                seen.add(emoji)
+        if len(emojis) == 3:
+            break
 
     cursor.close()
     conn.close()
 
-    return ''.join(emoji_sequence)
+    return ''.join(emojis) if emojis else "🍽️"

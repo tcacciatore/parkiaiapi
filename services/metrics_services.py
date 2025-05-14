@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import logging
 
-from parkiaiapi.models.state import State
+from models.state import State
 
 class MetricsService:
 

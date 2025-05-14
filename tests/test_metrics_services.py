@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 import pytest
-from parkiaiapi.services.metrics_services import MetricsService
-from parkiaiapi.models.state import State
+from services.metrics_services import MetricsService
+from models.state import State
 
 @pytest.fixture
 def etats_json():

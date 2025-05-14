@@ -1,4 +1,4 @@
-#!/Users/thomas/Documents/my_devs/my_devs/parkiai/parkiai_api/venv/bin/python3
+#!/Users/thomas/Documents/my_devs/my_devs/parkiai/parkiai_api/venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys

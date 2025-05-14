@@ -1,0 +1,60 @@
+# === Environnements virtuels ===
+venv/
+.env/
+.venv/
+ENV/
+env/
+
+# === Fichiers Python compilés ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# === Fichiers de logs / debug ===
+*.log
+
+# === Tests ===
+.cache/
+pytest_cache/
+.tox/
+
+# === IDE ===
+.vscode/
+.idea/
+
+# === Systèmes ===
+.DS_Store
+Thumbs.db
+
+# === Dépendances ===
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# === Outils de type checking / formatage ===
+.mypy_cache/
+.pytype/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+
+# === Jupyter / IPython ===
+.ipynb_checkpoints/
+*.ipynb
+
+# === Build / dist ===
+build/
+dist/
+*.egg
+MANIFEST
+
+# === Secrets potentiels ===
+.env.local
+.env.*.local
+*.env
+secrets*.json
+
+# === PyInstaller ===
+*.spec
